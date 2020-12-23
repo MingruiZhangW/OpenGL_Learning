@@ -11,6 +11,7 @@
 
 // Window dim
 const GLint WIDTH = 800, HEIGHT = 600;
+const float toRadians = 3.14159265f / 180.0f;
 
 // ID
 GLuint VAO, VBO, shader, uniformModel;
@@ -19,6 +20,13 @@ bool direction = true;
 float triOffset = 0.0f;
 float triMaxOffset = 0.7f;
 float triIncrement = 0.0005f;
+
+float currentAngle = 0.0f;
+
+bool sizeDirection = true;
+float currentSize = 0.4f;
+float maxSize = 0.8f;
+float minSize = 0.1f;
 
 // Vertex Shader
 // gl_Position built in (out), final pos for now
@@ -32,7 +40,7 @@ uniform mat4 model;                                                   \n\
                                                                       \n\
 void main()                                                           \n\
 {                                                                     \n\
-  gl_Position = model * vec4(0.4 * pos.x, 0.4 * pos.y, pos.z, 1.0);   \n\
+  gl_Position = model * vec4(pos, 1.0);                               \n\
 }";
 
 // Fragment Shader
@@ -209,6 +217,20 @@ int main()
         if (abs(triOffset) >= triMaxOffset)
             direction = !direction;
 
+        currentAngle += 0.001f;
+        if (currentAngle >= 360.0f)
+            currentAngle -= 360;
+
+        if (sizeDirection) {
+            currentSize += 0.0001f;
+        }
+        else {
+            currentSize -= 0.0001f;
+        }
+
+        if (currentSize >= maxSize || currentSize <= minSize)
+            sizeDirection = !sizeDirection;
+
         // Clear window (buffer cannot be seen)
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -218,8 +240,15 @@ int main()
 
         // Identity matrix
         glm::mat4 model(1.0f);
+
         // Translation x value
-        model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
+        //model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
+
+        // The distortion is because of lacking Projection matrix
+        //model = glm::rotate(model, currentAngle * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+
+        // x, y scale by 2
+        model = glm::scale(model, glm::vec3(currentSize, currentSize, 1.0f));
 
         // Set uniform var
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));

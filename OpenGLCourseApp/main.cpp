@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <cmath>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -8,7 +9,12 @@
 const GLint WIDTH = 800, HEIGHT = 600;
 
 // ID
-GLuint VAO, VBO, shader;
+GLuint VAO, VBO, shader, uniformXMove;
+
+bool direction = true;
+float triOffset = 0.0f;
+float triMaxOffset = 0.7f;
+float triIncrement = 0.0005f;
 
 // Vertex Shader
 // gl_Position built in (out), final pos for now
@@ -18,9 +24,11 @@ static const char* vShader = "                                        \n\
                                                                       \n\
 layout (location = 0) in vec3 pos;                                    \n\
                                                                       \n\
+uniform float xMove;                                                  \n\
+                                                                      \n\
 void main()                                                           \n\
 {                                                                     \n\
-  gl_Position = vec4(0.4 * pos.x, 0.4 * pos.y, pos.z, 1.0);           \n\
+  gl_Position = vec4(0.4 * pos.x + xMove, 0.4 * pos.y, pos.z, 1.0);   \n\
 }";
 
 // Fragment Shader
@@ -123,6 +131,9 @@ void CompileShader() {
         glGetProgramInfoLog(shader, sizeof(eLog), NULL, eLog);
         printf("Error validating program: '%s'\n", eLog);
     }
+
+    // Get uniform var location
+    uniformXMove = glGetUniformLocation(shader, "xMove");
 }
 
 int main()
@@ -184,12 +195,26 @@ int main()
         // Get + handle user input events
         glfwPollEvents();
 
+        if (direction) {
+            triOffset += triIncrement;
+        }
+        else {
+            triOffset -= triIncrement;
+        }
+
+        if (abs(triOffset) >= triMaxOffset)
+            direction = !direction;
+
         // Clear window (buffer cannot be seen)
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Draw triangle
         glUseProgram(shader);
+
+        // Set uniform var
+
+        glUniform1f(uniformXMove, triOffset);
 
         glBindVertexArray(VAO);
 

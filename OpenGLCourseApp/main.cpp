@@ -14,7 +14,7 @@ const GLint WIDTH = 800, HEIGHT = 600;
 const float toRadians = 3.14159265f / 180.0f;
 
 // ID
-GLuint VAO, VBO, shader, uniformModel;
+GLuint VAO, VBO, IBO, shader, uniformModel;
 
 bool direction = true;
 float triOffset = 0.0f;
@@ -65,8 +65,18 @@ void main()                                                           \n\
 
 void CreateTriangle()
 {
+    // Vertex to use in order from vertices array
+    // to draw a pyramid
+    unsigned int indices[] = {
+        0, 3, 1,
+        1, 3, 2,
+        2, 3, 0,
+        0, 1, 2
+    };
+
     GLfloat vertices[] = {
         -1.0f, -1.0f, 0.0f, // x, y ,z
+        0.0f, -1.0f, 1.0f,
         1.0f, -1.0f, 0.0f,
         0.0f, 1.0f, 0.0f
     };
@@ -75,10 +85,17 @@ void CreateTriangle()
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
+    // IBO (EBO)
+    glGenBuffers(1, &IBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
     // VBO
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    // Now IBO and the VBO are binded to VAO
 
     // x, y, z -> 3 value a vertex
     // location 0
@@ -89,6 +106,9 @@ void CreateTriangle()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glBindVertexArray(0);
+
+    // Need to unbind IBO/EBO after VAO unbinded
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType) {
@@ -200,6 +220,9 @@ int main()
         return 1;
     }
 
+    // Help us to test which triangle to be drawen at the top of others
+    glEnable(GL_DEPTH_TEST);
+
     // Setup Viewport size (gl)
     // sets up the size of the part we draw to on our window
     // entire window
@@ -224,7 +247,7 @@ int main()
         if (abs(triOffset) >= triMaxOffset)
             direction = !direction;
 
-        currentAngle += 0.001f;
+        currentAngle += 0.005f;
         if (currentAngle >= 360.0f)
             currentAngle -= 360;
 
@@ -240,7 +263,7 @@ int main()
 
         // Clear window (buffer cannot be seen)
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // Draw triangle
         glUseProgram(shader);
@@ -252,7 +275,7 @@ int main()
         //model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f));
 
         // The distortion is because of lacking Projection matrix
-        //model = glm::rotate(model, currentAngle * toRadians, glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::rotate(model, currentAngle * toRadians, glm::vec3(0.0f, 1.0f, 0.0f));
 
         // x, y scale by 2
         model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
@@ -261,10 +284,12 @@ int main()
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
         glBindVertexArray(VAO);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
         // Unassign the shader
         glUseProgram(0);

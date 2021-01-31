@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <string.h>
 #include <cmath>
 #include <vector>
@@ -45,23 +45,25 @@ static const char* vShader = "Shaders/shader.vert";
 // Here it interpolates the vertices to pixels
 static const char* fShader = "Shaders/shader.frag";
 
-void CreateObject()
+void
+CreateObject()
 {
     // Vertex to use in order from vertices array
     // to draw a pyramid
-    unsigned int indices[] = {
-        0, 3, 1,
-        1, 3, 2,
-        2, 3, 0,
-        0, 1, 2
-    };
+    unsigned int indices[] = {0, 3, 1, 1, 3, 2, 2, 3, 0, 0, 1, 2};
 
-    GLfloat vertices[] = {
-        -1.0f, -1.0f, 0.0f, // x, y ,z
-        0.0f, -1.0f, 1.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f
-    };
+    GLfloat vertices[] = {-1.0f,
+                          -1.0f,
+                          0.0f, // x, y ,z
+                          0.0f,
+                          -1.0f,
+                          1.0f,
+                          1.0f,
+                          -1.0f,
+                          0.0f,
+                          0.0f,
+                          1.0f,
+                          0.0f};
 
     Mesh* obj1 = new Mesh();
     obj1->CreateMesh(vertices, indices, 12, 12);
@@ -72,14 +74,16 @@ void CreateObject()
     meshList.emplace_back(obj2);
 }
 
-void CreateShader()
+void
+CreateShader()
 {
     Shader* shader1 = new Shader();
     shader1->CreateFromFiles(vShader, fShader);
     shaderList.emplace_back(shader1);
 }
 
-int main()
+int
+main()
 {
     Window mainWindow(WIDTH, HEIGHT);
     mainWindow.Initialise();
@@ -95,18 +99,19 @@ int main()
     // 3: Near field
     // 4: Far field
     glm::mat4 projection = glm::perspective(45.0f,
-        mainWindow.getBufferWidth() / mainWindow.getBufferHeight(), 0.1f, 100.0f);
+                                            mainWindow.getBufferWidth()
+                                                / mainWindow.getBufferHeight(),
+                                            0.1f,
+                                            100.0f);
 
     // Loop until window closes
-    while (!mainWindow.getShouldClose())
-    {
+    while (!mainWindow.getShouldClose()) {
         // Get + handle user input events
         glfwPollEvents();
 
         if (direction) {
             triOffset += triIncrement;
-        }
-        else {
+        } else {
             triOffset -= triIncrement;
         }
 
@@ -119,8 +124,7 @@ int main()
 
         if (sizeDirection) {
             currentSize += 0.0001f;
-        }
-        else {
+        } else {
             currentSize -= 0.0001f;
         }
 
@@ -159,7 +163,6 @@ int main()
         glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
         meshList[1]->RenderMesh();
-
 
         // Unassign the shader
         Shader::UnUseShader();

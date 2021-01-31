@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <stdio.h>
 #include <string>
@@ -24,18 +24,18 @@ public:
     void UseShader();
     void ClearShader();
 
-    static void UnUseShader() {
+    static void UnUseShader()
+    {
         // Unassign the shader
         glUseProgram(0);
     }
 
 private:
     // uniformModel, uniformProjection are for model mat and projection mat
-    GLuint shaderID_{ 0 };
-    GLuint uniformProjection_{ 0 };
-    GLuint uniformModel_{ 0 };
+    GLuint shaderID_ {0};
+    GLuint uniformProjection_ {0};
+    GLuint uniformModel_ {0};
 
     void CompileShader(const char* vertexCode, const char* fragmentCode);
     void AddShader(GLuint theProgram, const char* shaderCode, GLenum shaderType);
 };
-

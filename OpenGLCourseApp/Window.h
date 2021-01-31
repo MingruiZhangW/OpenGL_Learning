@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <stdio.h>
 
@@ -15,12 +15,22 @@ public:
 
     int Initialise();
 
-    GLfloat getBufferWidth() { return bufferWidth_; }
-    GLfloat getBufferHeight() { return bufferHeight_; }
+    GLfloat getBufferWidth()
+    {
+        return bufferWidth_;
+    }
+    GLfloat getBufferHeight()
+    {
+        return bufferHeight_;
+    }
 
-    bool getShouldClose() { return glfwWindowShouldClose(mainWindow_); }
+    bool getShouldClose()
+    {
+        return glfwWindowShouldClose(mainWindow_);
+    }
 
-    void swapBuffers() {
+    void swapBuffers()
+    {
         // triple/two buffer (buffer that can be seen)
         glfwSwapBuffers(mainWindow_);
     }
@@ -28,7 +38,6 @@ public:
 private:
     GLFWwindow* mainWindow_;
 
-    GLint width_{ 800 }, height_{ 600 };
-    GLint bufferWidth_{ 0 }, bufferHeight_{ 0 };
+    GLint width_ {800}, height_ {600};
+    GLint bufferWidth_ {0}, bufferHeight_ {0};
 };
-

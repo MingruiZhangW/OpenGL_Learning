@@ -1,14 +1,11 @@
-#include "Window.h"
+﻿#include "Window.h"
 
-Window::Window()
-{
-}
+Window::Window() {}
 
 Window::Window(GLint windowWidth, GLint windowHeight)
-    : width_(windowWidth),
-    height_(windowHeight)
-{
-}
+    : width_(windowWidth)
+    , height_(windowHeight)
+{}
 
 Window::~Window()
 {
@@ -16,7 +13,8 @@ Window::~Window()
     glfwTerminate();
 }
 
-int Window::Initialise()
+int
+Window::Initialise()
 {
     // Init GLFW
     if (!glfwInit()) {
